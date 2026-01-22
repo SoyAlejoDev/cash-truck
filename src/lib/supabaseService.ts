@@ -1,6 +1,13 @@
-import { supabase } from '../lib/supabase';
-import { AppState, WeekData, Expense, Income, ExpenseInput, IncomeInput } from '../types';
-import { formatDateToString, getWeekRange } from '../utils/dateUtils';
+import { supabase } from "../lib/supabase";
+import {
+  AppState,
+  WeekData,
+  Expense,
+  Income,
+  ExpenseInput,
+  IncomeInput,
+} from "../types";
+import { formatDateToString, getWeekRange } from "../utils/dateUtils";
 
 /**
  * Supabase service for managing weeks, expenses, and incomes
@@ -10,56 +17,60 @@ export class SupabaseService {
    * Get all data for the current user
    */
   static async loadUserData(): Promise<AppState> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('No authenticated user');
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("No authenticated user");
 
     // Get weeks
     const { data: weeks, error: weeksError } = await supabase
-      .from('weeks')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('start_date', { ascending: false });
+      .from("weeks")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("start_date", { ascending: false });
 
     if (weeksError) throw weeksError;
 
     // Get expenses for all weeks
     const { data: expenses, error: expensesError } = await supabase
-      .from('expenses')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('date', { ascending: false });
+      .from("expenses")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("date", { ascending: false });
 
     if (expensesError) throw expensesError;
 
     // Get incomes for all weeks
     const { data: incomes, error: incomesError } = await supabase
-      .from('incomes')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('date', { ascending: false });
+      .from("incomes")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("date", { ascending: false });
 
     if (incomesError) throw incomesError;
 
     // Group expenses and incomes by week
-    const weeksWithData: WeekData[] = weeks?.map(week => ({
-      id: week.id,
-      startDate: week.start_date,
-      endDate: week.end_date,
-      expenses: expenses?.filter(exp => exp.week_id === week.id) || [],
-      incomes: incomes?.filter(inc => inc.week_id === week.id) || []
-    })) || [];
+    const weeksWithData: WeekData[] =
+      weeks?.map((week) => ({
+        id: week.id,
+        startDate: week.start_date,
+        endDate: week.end_date,
+        expenses: expenses?.filter((exp) => exp.week_id === week.id) || [],
+        incomes: incomes?.filter((inc) => inc.week_id === week.id) || [],
+      })) || [];
 
     // Find current week or create default
     const now = new Date();
     const { startDate, endDate } = getWeekRange(now);
-    const currentWeek = weeksWithData.find(week =>
-      week.startDate === formatDateToString(startDate) &&
-      week.endDate === formatDateToString(endDate)
+    const currentWeek = weeksWithData.find(
+      (week) =>
+        week.startDate === formatDateToString(startDate) &&
+        week.endDate === formatDateToString(endDate),
     );
 
     return {
       weeks: weeksWithData,
-      currentWeekId: currentWeek?.id || null
+      currentWeekId: currentWeek?.id || null,
     };
   }
 
@@ -67,8 +78,10 @@ export class SupabaseService {
    * Create or get week for a specific date
    */
   static async getOrCreateWeek(date: Date): Promise<WeekData> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('No authenticated user');
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("No authenticated user");
 
     const { startDate, endDate } = getWeekRange(date);
     const startDateStr = formatDateToString(startDate);
@@ -76,22 +89,23 @@ export class SupabaseService {
 
     // Check if week exists
     const { data: existingWeek, error: fetchError } = await supabase
-      .from('weeks')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('start_date', startDateStr)
-      .eq('end_date', endDateStr)
+      .from("weeks")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("start_date", startDateStr)
+      .eq("end_date", endDateStr)
       .single();
 
-    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = no rows found
+    if (fetchError && fetchError.code !== "PGRST116") {
+      // PGRST116 = no rows found
       throw fetchError;
     }
 
     if (existingWeek) {
       // Get expenses and incomes for this week
       const [expensesResult, incomesResult] = await Promise.all([
-        supabase.from('expenses').select('*').eq('week_id', existingWeek.id),
-        supabase.from('incomes').select('*').eq('week_id', existingWeek.id)
+        supabase.from("expenses").select("*").eq("week_id", existingWeek.id),
+        supabase.from("incomes").select("*").eq("week_id", existingWeek.id),
       ]);
 
       return {
@@ -99,17 +113,17 @@ export class SupabaseService {
         startDate: existingWeek.start_date,
         endDate: existingWeek.end_date,
         expenses: expensesResult.data || [],
-        incomes: incomesResult.data || []
+        incomes: incomesResult.data || [],
       };
     }
 
     // Create new week
     const { data: newWeek, error: insertError } = await supabase
-      .from('weeks')
+      .from("weeks")
       .insert({
         start_date: startDateStr,
         end_date: endDateStr,
-        user_id: user.id
+        user_id: user.id,
       })
       .select()
       .single();
@@ -121,28 +135,40 @@ export class SupabaseService {
       startDate: newWeek.start_date,
       endDate: newWeek.end_date,
       expenses: [],
-      incomes: []
+      incomes: [],
     };
   }
 
   /**
    * Add an expense
    */
-  static async addExpense(weekId: string, expense: ExpenseInput): Promise<Expense> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('No authenticated user');
+  static async addExpense(
+    weekId: string,
+    expense: ExpenseInput,
+  ): Promise<Expense> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("No authenticated user");
+    if (!weekId) throw new Error("Week ID is required");
+
+    console.log("Adding expense:", { weekId, expense, userId: user.id });
 
     const { data, error } = await supabase
-      .from('expenses')
+      .from("expenses")
       .insert({
         ...expense,
         week_id: weekId,
-        user_id: user.id
+        user_id: user.id,
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Expense insert error:", error);
+      throw new Error(`Failed to add expense: ${error.message}`);
+    }
+    console.log("Expense added successfully:", data);
     return data;
   }
 
@@ -150,20 +176,29 @@ export class SupabaseService {
    * Add an income
    */
   static async addIncome(weekId: string, income: IncomeInput): Promise<Income> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('No authenticated user');
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("No authenticated user");
+    if (!weekId) throw new Error("Week ID is required");
+
+    console.log("Adding income:", { weekId, income, userId: user.id });
 
     const { data, error } = await supabase
-      .from('incomes')
+      .from("incomes")
       .insert({
         ...income,
         week_id: weekId,
-        user_id: user.id
+        user_id: user.id,
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Income insert error:", error);
+      throw new Error(`Failed to add income: ${error.message}`);
+    }
+    console.log("Income added successfully:", data);
     return data;
   }
 
@@ -172,9 +207,9 @@ export class SupabaseService {
    */
   static async updateExpense(expense: Expense): Promise<Expense> {
     const { data, error } = await supabase
-      .from('expenses')
+      .from("expenses")
       .update(expense)
-      .eq('id', expense.id)
+      .eq("id", expense.id)
       .select()
       .single();
 
@@ -187,9 +222,9 @@ export class SupabaseService {
    */
   static async updateIncome(income: Income): Promise<Income> {
     const { data, error } = await supabase
-      .from('incomes')
+      .from("incomes")
       .update(income)
-      .eq('id', income.id)
+      .eq("id", income.id)
       .select()
       .single();
 
@@ -201,10 +236,7 @@ export class SupabaseService {
    * Delete an expense
    */
   static async deleteExpense(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('expenses')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from("expenses").delete().eq("id", id);
 
     if (error) throw error;
   }
@@ -213,10 +245,7 @@ export class SupabaseService {
    * Delete an income
    */
   static async deleteIncome(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('incomes')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from("incomes").delete().eq("id", id);
 
     if (error) throw error;
   }
