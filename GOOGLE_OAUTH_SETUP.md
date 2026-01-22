@@ -23,7 +23,7 @@ Esta guía te explica cómo configurar la autenticación con Google para tu apli
      ```
      https://your-project.supabase.co/auth/v1/callback
      ```
-     *(Reemplaza `your-project` con el ID de tu proyecto Supabase)*
+     _(Reemplaza `your-project` con el ID de tu proyecto Supabase)_
 
 4. Copia el **Client ID** y **Client Secret** que se generan
 
@@ -46,37 +46,43 @@ Esta guía te explica cómo configurar la autenticación con Google para tu apli
 ## 🔧 Solución de problemas
 
 ### Error: "Invalid OAuth access token"
+
 - Verifica que el redirect URI en Google Cloud Console coincida exactamente con el formato de Supabase
 - Asegúrate de que la API de Google+ esté habilitada
 
 ### Error: "OAuth provider not configured"
+
 - Verifica que hayas habilitado Google en Supabase Authentication > Providers
 - Confirma que las credenciales sean correctas
 
 ### Botón de Google no aparece
+
 - Verifica que las variables de entorno estén configuradas correctamente
 - Revisa la consola del navegador por errores
 
 ## 📝 Variables de entorno
 
-Asegúrate de tener estas variables en tu archivo `.env`:
+Asegúrate de tener estas variables en tu archivo `.env.local` (este archivo NO debe commiterse):
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_xxxxxxxxxxxxxxxxxxxx
 ```
 
-## 🔄 Regenerar variables de entorno
+## 🔄 Obtener/Regenerar claves de Supabase
 
-Si necesitas regenerar las claves de Supabase:
+Si necesitas obtener o regenerar las claves de Supabase:
 
-1. Ve a tu proyecto Supabase > Settings > API
-2. Copia la nueva Project URL y anon key
-3. Actualiza tu archivo `.env`
-4. Reinicia la aplicación
+1. Ve a tu proyecto Supabase > Settings > API Keys
+2. Copia la Project URL
+3. Copia la Publishable Key (nuevo formato: sb_publishable_xxx)
+4. Actualiza tu archivo `.env.local`
+
+⚠️ **IMPORTANTE:** La Publishable Key es segura para usar en el cliente. NUNCA expongas la service_role key en el navegador 4. Reinicia la aplicación
 
 ## 📞 Soporte
 
 Si tienes problemas con la configuración, revisa:
+
 - [Documentación de Supabase Auth](https://supabase.com/docs/guides/auth)
 - [Guía de OAuth de Google](https://developers.google.com/identity/protocols/oauth2)

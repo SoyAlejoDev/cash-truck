@@ -1,8 +1,11 @@
-# Trucker Finance App
+# 🚛 Trucker Finance App
 
 A modern, responsive finance management application designed specifically for truck drivers to track their income and expenses on a weekly basis.
 
-## 🚛 Features
+**Live Demo**: [Coming Soon]  
+**Documentation**: [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md)
+
+## ✨ Features
 
 - **Weekly Financial Tracking**: Monitor income and expenses by week with easy navigation
 - **Income Management**: Record and track all income sources (freights, bonuses, etc.)
@@ -26,107 +29,98 @@ A modern, responsive finance management application designed specifically for tr
 
 ## 📋 Prerequisites
 
-- Node.js (version 18 or higher)
-- npm or yarn package manager
-- Supabase account and project
-- Google Cloud Console account (for Google OAuth)
+- **Node.js** v18+ and **pnpm** (or npm/yarn)
+- **Supabase** account ([create one here](https://supabase.com))
+- **Git** for version control
+- _Optional:_ **Google Cloud Console** account (for Google OAuth integration)
 
 ## 🚀 Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd cash-truck
-   ```
+### Step 1: Clone the Repository
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+```bash
+git clone <repository-url>
+cd trucker-finance-app
+```
 
-3. **Supabase Setup**
-   - Create a new project at [supabase.com](https://supabase.com)
-   - Run the database migrations:
-     ```bash
-     npx supabase db push
-     ```
+### Step 2: Install Dependencies
 
-4. **Environment Setup**
-   Create a `.env` file in the root directory:
+```bash
+pnpm install
+# or: npm install / yarn install
+```
 
-   **Basic Configuration:**
-   ```env
-   VITE_SUPABASE_URL=your-supabase-project-url
-   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-   ```
+### Step 3: Create Supabase Project
 
-   **To regenerate these values:**
-   - Go to your Supabase project dashboard
-   - Navigate to Settings > API
-   - Copy the Project URL and anon/public key
+1. Go to [supabase.com](https://supabase.com) and sign up
+2. Create a new project
+3. Wait for the project to initialize
 
-5. **Google OAuth Setup (Optional)**
-   If you want to enable Google sign-in:
+### Step 4: Set Up Environment Variables
 
-   a. **Create Google OAuth credentials:**
-   - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a new project or select existing
-   - Enable Google+ API
-   - Go to "Credentials" > "Create Credentials" > "OAuth 2.0 Client IDs"
-   - Set authorized redirect URI to: `https://your-project.supabase.co/auth/v1/callback`
+Create a `.env.local` file in the project root (this file is already in `.gitignore`):
 
-   b. **Configure in Supabase:**
-   - Go to Authentication > Providers in your Supabase dashboard
-   - Enable Google provider
-   - Enter your Google Client ID and Client Secret
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_xxxxxxxxxxxxxxxxxxxx
+```
 
-   c. **Update environment variables:**
-   ```env
-   VITE_SUPABASE_URL=your-supabase-project-url
-   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-   ```
+**How to get these values:**
 
-4. **Database Setup**
-   Run the Supabase migrations:
-   ```bash
-   npx supabase db push
-   ```
+1. Go to your Supabase project dashboard
+2. Navigate to **Settings > API Keys**
+3. Copy **Project URL**
+4. Copy **Publishable Key** (new format: `sb_publishable_xxx`)
+5. ⚠️ **Never expose `service_role` key in the browser**
 
-5. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+### Step 5: Run Database Migrations
 
-6. **Verify setup (recommended)**
-   ```bash
-   ./verify-setup.sh
-   ```
+```bash
+npx supabase db push
+```
 
-7. **Build for production**
-   ```bash
-   npm run build
-   npm run preview
-   ```
+### Step 6: Set Up Google OAuth (Optional)
+
+For detailed Google OAuth setup instructions, see [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md)
+
+### Step 7: Start Development Server
+
+```bash
+pnpm run dev
+```
+
+The app will be available at `http://localhost:5173`
+
+### Step 8: Build for Production
+
+```bash
+pnpm run build      # Build optimized bundle
+pnpm run preview    # Preview production build locally
+```
 
 ## 📖 Usage
 
 ### Getting Started
+
 1. Create an account or log in to your existing account
 2. The dashboard will show your current week's financial overview
 3. Use the week selector to navigate between different weeks
 
 ### Adding Income
+
 - Click "Add Income" in the Income section
 - Enter the amount, description, and date
 - Income will be automatically added to your weekly totals
 
 ### Recording Expenses
+
 - Click "Add Expense" in the Expenses section
 - Select expense category (Fuel, Maintenance, Tolls, etc.)
 - Enter amount, description, and date
 - View expense breakdown in the dashboard
 
 ### Viewing Reports
+
 - Navigate to the Reports page
 - Generate monthly or yearly financial reports
 - Export or print reports as needed
@@ -168,16 +162,36 @@ src/
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙋‍♂️ Support
+## � Security Best Practices
 
-If you have any questions or need help, please open an issue on GitHub or contact the development team.
+- ✅ Never commit `.env.local` (already in `.gitignore`)
+- ✅ Always use `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY` in browser code
+- ✅ Keep `service_role` key secret - use only in backend/Edge Functions
+- ✅ Enable Row Level Security (RLS) policies in Supabase
+- ✅ Rotate API keys if they're accidentally exposed
+- ✅ Use HTTPS in production
+
+## 🆘 Getting Help
+
+- 📖 Check the [Troubleshooting](#troubleshooting) section above
+- 🔗 Read [Supabase Docs](https://supabase.com/docs)
+- 📧 See [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md) for OAuth help
+- 🐙 Open an issue on GitHub for bugs or feature requests
 
 ## 🐛 Troubleshooting
 
-### Database Issues
-If you encounter database-related errors:
+| Command             | Description                       |
+| ------------------- | --------------------------------- |
+| `pnpm run dev`      | Start development server (Vite)   |
+| `pnpm run build`    | Build optimized production bundle |
+| `pnpm run preview`  | Preview production build locally  |
+| `pnpm run lint`     | Run ESLint to check code quality  |
+| `pnpm run lint:fix` | Auto-fix ESLint issues            |
+
+**Using npm/yarn instead?** Replace `pnpm` with `npm` or `yarn`
 
 1. **Run the verification script:**
+
    ```bash
    ./verify-setup.sh
    ```
@@ -190,31 +204,74 @@ If you encounter database-related errors:
    - If RLS errors occur, run `fix-rls.sql` in SQL Editor
 
 ### Authentication Issues
-- **Google OAuth:** Ensure Google provider is enabled in Supabase
-- **Reset password:** Check email templates in Supabase Auth settings
-- **Environment variables:** Verify `.env` file has correct values
 
-### Build Issues
-- Clear cache: `rm -rf node_modules/.vite && npm run dev`
-- Reinstall: `rm -rf node_modules package-lock.json && npm install`
+Environment Variables Not Loading
 
-## 📊 Database Schema
+**Error:** `Missing Supabase environment variables`
 
+**Solution:**
+
+1. Verify `.env.local` exists in project root
+2. Variables must start with `VITE_` prefix
+3. Restart dev server after changing `.env.local`
+4. Check for typos in variable names
+
+### Database Connection Issues
+
+**Error:** "Unable to connect to database"
+
+**Solution:**
+
+1. Verify `VITE_SUPABASE_URL` is correct
+2. Check Supabase project is active (not paused)
+3. Ensure database migrations are applied:
+   ```bash
+   npx supabase db push
+   ```
+
+### Authentication Errors
+
+**Google OAuth not working:**
+
+## 📚 Additional Resources
+
+- [Supabase Documentation](https://supabase.com/docs)
+- [React 18 Guide](https://react.dev)
+- [Vite Documentation](https://vitejs.dev)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs)
+- [Tailwind CSS Docs](https://tailwindcss.com/docs)
+
+---
+
+**Happy trucking and stay profitable! 🚚💰**
+
+Made with ❤️ for truck driversentication > Providers
+
+- Check redirect URI matches exactly: `https://your-project.supabase.co/auth/v1/callback`
+- See [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md) for detailed setup
+
+**Login/Signup failures:**
+
+- Check `.env.local` has correct `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
+- Verify RLS policies are properly configured in Supabase
+
+### Build/Performance Issues
+
+**Clear cache and reinstall:**
+
+```bash
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+pnpm run dev
 ```
-weeks
-├── id (uuid, primary key)
-├── start_date (date)
-├── end_date (date)
-├── user_id (uuid, references auth.users)
-└── created_at (timestamp)
 
-expenses
-├── id (uuid, primary key)
-├── week_id (uuid, references weeks)
-├── date (date)
-├── amount (decimal)
-├── category (text: 'fuel', 'maintenance', 'other')
-├── description (text)
+**Dev server not starting:**
+
+```bash
+# Kill any running processes on port 5173
+lsof -ti:5173 | xargs kill -9
+pnpm run dev
+``
 ├── user_id (uuid, references auth.users)
 └── created_at (timestamp)
 
