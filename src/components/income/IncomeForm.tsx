@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Income } from '../../types';
+import { Income, IncomeInput } from '../../types';
 import Button from '../common/Button';
 import { useAppContext } from '../../context/AppContext';
 
@@ -16,10 +16,10 @@ const IncomeForm: React.FC<IncomeFormProps> = ({
 }) => {
   const { addIncome, updateIncome, currentWeek } = useAppContext();
 
-  const [formData, setFormData] = useState<Omit<Income, 'id'>>({
+  const [formData, setFormData] = useState<IncomeInput>({
     date: initialData?.date || (currentWeek?.startDate || new Date().toISOString().split('T')[0]),
     amount: initialData?.amount || 0,
-    description: initialData?.description || ''
+    description: initialData?.description || null
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -79,7 +79,9 @@ const IncomeForm: React.FC<IncomeFormProps> = ({
       if (isEditing && initialData) {
         await updateIncome({
           ...formData,
-          id: initialData.id
+          id: initialData.id,
+          week_id: initialData.week_id,
+          user_id: initialData.user_id
         });
       } else {
         await addIncome(formData);
@@ -138,7 +140,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({
         <textarea
           id="description"
           name="description"
-          value={formData.description}
+          value={formData.description || ''}
           onChange={handleChange}
           rows={3}
           placeholder="Enter income details (optional)"

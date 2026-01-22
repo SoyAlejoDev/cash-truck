@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Expense, ExpenseCategory } from '../../types';
+import { Expense, ExpenseInput } from '../../types';
 import Button from '../common/Button';
 import { useAppContext } from '../../context/AppContext';
 
@@ -16,11 +16,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
 }) => {
   const { addExpense, updateExpense, currentWeek } = useAppContext();
 
-  const [formData, setFormData] = useState<Omit<Expense, 'id'>>({
+  const [formData, setFormData] = useState<ExpenseInput>({
     date: initialData?.date || (currentWeek?.startDate || new Date().toISOString().split('T')[0]),
     amount: initialData?.amount || 0,
     category: initialData?.category || 'fuel',
-    description: initialData?.description || ''
+    description: initialData?.description || null
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -80,7 +80,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       if (isEditing && initialData) {
         await updateExpense({
           ...formData,
-          id: initialData.id
+          id: initialData.id,
+          week_id: initialData.week_id,
+          user_id: initialData.user_id
         });
       } else {
         await addExpense(formData);
@@ -156,7 +158,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         <textarea
           id="description"
           name="description"
-          value={formData.description}
+          value={formData.description || ''}
           onChange={handleChange}
           rows={3}
           placeholder="Enter expense details (optional)"

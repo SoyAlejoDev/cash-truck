@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { AppState, WeekData, Expense, Income } from '../types';
+import { AppState, WeekData, Expense, Income, ExpenseInput, IncomeInput } from '../types';
 import { formatDateToString, getWeekRange } from '../utils/dateUtils';
 
 /**
@@ -128,7 +128,7 @@ export class SupabaseService {
   /**
    * Add an expense
    */
-  static async addExpense(weekId: string, expense: Omit<Expense, 'id' | 'user_id'>): Promise<Expense> {
+  static async addExpense(weekId: string, expense: ExpenseInput): Promise<Expense> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('No authenticated user');
 
@@ -149,7 +149,7 @@ export class SupabaseService {
   /**
    * Add an income
    */
-  static async addIncome(weekId: string, income: Omit<Income, 'id' | 'user_id'>): Promise<Income> {
+  static async addIncome(weekId: string, income: IncomeInput): Promise<Income> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('No authenticated user');
 

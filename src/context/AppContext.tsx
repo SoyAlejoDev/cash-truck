@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useReducer } from 'react';
-import { AppState, Expense, Income, WeekData } from '../types';
+import { AppState, Expense, Income, ExpenseInput, IncomeInput, WeekData } from '../types';
 import { SupabaseService } from '../lib/supabaseService';
 import { useAuth } from './AuthContext';
 
@@ -21,8 +21,8 @@ interface AppContextType {
   state: AppState & { loading: boolean };
   currentWeek: WeekData | undefined;
   dispatch: React.Dispatch<Action>;
-  addExpense: (expense: Omit<Expense, 'id' | 'user_id'>) => Promise<void>;
-  addIncome: (income: Omit<Income, 'id' | 'user_id'>) => Promise<void>;
+  addExpense: (expense: ExpenseInput) => Promise<void>;
+  addIncome: (income: IncomeInput) => Promise<void>;
   updateExpense: (expense: Expense) => Promise<void>;
   updateIncome: (income: Income) => Promise<void>;
   deleteExpense: (id: string) => Promise<void>;
@@ -179,7 +179,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [user]);
   
   // Helper functions
-  const addExpense = async (expense: Omit<Expense, 'id' | 'user_id'>) => {
+  const addExpense = async (expense: ExpenseInput) => {
     if (!currentWeek) return;
     try {
       const newExpense = await SupabaseService.addExpense(currentWeek.id, expense);
@@ -190,7 +190,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const addIncome = async (income: Omit<Income, 'id' | 'user_id'>) => {
+  const addIncome = async (income: IncomeInput) => {
     if (!currentWeek) return;
     try {
       const newIncome = await SupabaseService.addIncome(currentWeek.id, income);
