@@ -1,0 +1,29 @@
+export type ExpenseCategory = 'fuel' | 'maintenance' | 'other';
+
+export interface Expense {
+  id: string;
+  date: string;
+  amount: number;
+  category: ExpenseCategory;
+  description: string;
+}
+
+export interface Income {
+  id: string;
+  date: string;
+  amount: number;
+  description: string;
+}
+
+export interface WeekData {
+  id: string;
+  startDate: string; // Sunday
+  endDate: string;   // Saturday
+  expenses: Expense[];
+  incomes: Income[];
+}
+
+export interface AppState {
+  weeks: WeekData[];
+  currentWeekId: string | null;
+}
